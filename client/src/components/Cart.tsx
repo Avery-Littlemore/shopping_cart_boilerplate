@@ -3,10 +3,11 @@ import { Product as ProductType } from '../types/index'
 
 interface CartProps {
   cart: ProductType[],
-  onBuy: () => void
+  onCheckout: () => void
 }
 
-const Cart = ({ cart, onBuy }: CartProps) => {
+const Cart = ({ cart, onCheckout }: CartProps) => {
+
   if (cart.length === 0) {
     return (
       <div className="cart">
@@ -21,29 +22,21 @@ const Cart = ({ cart, onBuy }: CartProps) => {
   const handleCheckout = (e: SyntheticEvent) => {
     e.preventDefault()
     if (confirm('Are you sure you want to buy all this trash?')) {
-      onBuy()
+      onCheckout()
     }
   }
 
   const calculateTotal = () => {
-    return cart.map(product => product.price).reduce((a, b) => a + b, 0).toFixed(2)
+    return cart.map(product => product.price * product.quantity).reduce((a, b) => a + b, 0).toFixed(2)
   }
 
   const mapProducts = () => {
-    let consolidatedProducts: {[key: string]: number[]} = {}
-    cart.forEach(product => {
-      if (product.title in consolidatedProducts) {
-        consolidatedProducts[product.title][0] += 1
-      } else {
-        consolidatedProducts[product.title] = [1, product.price]
-      }
-    })
-    return Object.keys(consolidatedProducts).map(product => {
+    return cart.map(product => {
       return (
-        <tr key={product}>
-          <td>{product}</td>
-          <td>{consolidatedProducts[product][0]}</td>
-          <td>{consolidatedProducts[product][1]}</td>
+        <tr key={product._id}>
+          <td>{product.title}</td>
+          <td>{product.quantity}</td>
+          <td>{product.price}</td>
         </tr>
       )
     })

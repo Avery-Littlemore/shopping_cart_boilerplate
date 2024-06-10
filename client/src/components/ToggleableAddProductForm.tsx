@@ -2,12 +2,13 @@ import { SyntheticEvent } from "react"
 import { useState } from 'react'
 import { Product } from '../types/index'
 
-interface AddProductFormProps {
-  onTriggerForm: () => void,
-  onAddProduct: (arg0: Product) => void
+interface ToggleableAddProductFormProps {
+  showAddProduct: boolean,
+  onToggleForm: () => void,
+  onAddProduct: (arg0: Omit<Product, '_id'>) => void
 }
 
-const AddProductForm = ({onTriggerForm, onAddProduct}: AddProductFormProps) => {
+const ToggleableAddProductForm = ({showAddProduct, onToggleForm, onAddProduct}: ToggleableAddProductFormProps) => {
   const [productTitle, setProductTitle] = useState('')
   const [price, setPrice] = useState('')
   const [quantity, setQuantity] = useState('')
@@ -20,6 +21,10 @@ const AddProductForm = ({onTriggerForm, onAddProduct}: AddProductFormProps) => {
       quantity: Number(quantity)
     }
     onAddProduct(newProduct)
+  }
+
+  if (!showAddProduct) {
+    return null
   }
 
   return (
@@ -63,11 +68,11 @@ const AddProductForm = ({onTriggerForm, onAddProduct}: AddProductFormProps) => {
         </div>
         <div className="actions form-actions">
           <button type="submit">Add</button>
-          <button type="button" onClick={onTriggerForm}>Cancel</button>
+          <button type="button" onClick={onToggleForm}>Cancel</button>
         </div>
       </form>
     </div>
   )
 }
 
-export default AddProductForm
+export default ToggleableAddProductForm

@@ -3,14 +3,14 @@ import { Product as ProductType } from '../types/index'
 
 interface HeaderProps {
   cart: ProductType[],
-  onBuy: () => void
+  onCheckout: () => void
 }
 
-const Header = ({ cart, onBuy }: HeaderProps) => {
+const Header = ({ cart, onCheckout }: HeaderProps) => {
   return (
     <header>
       <h1>The Shop!</h1>
-      <Cart cart={cart} onBuy={onBuy} />
+      <Cart cart={cart} onCheckout={onCheckout} />
     </header>
   )
 }

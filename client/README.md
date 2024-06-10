@@ -17,3 +17,5 @@ Still working on how to achieve that.
 Another issue that I've discovered with this is if I add to cart and then edit the quantity, my math does some weird stuff
 
 Also working on how to "buy" items, and what to return.
+
+Noticing another error where if I load a cart with multiple of the same item and then buy, it only subtracts the stock by 1

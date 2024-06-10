@@ -2,12 +2,13 @@ import { Product as ProductType } from "../types"
 import { useState } from 'react'
 import { SyntheticEvent } from "react"
 
-interface EditFormProps extends ProductType {
+interface ToggleableEditFormProps extends ProductType {
   onTriggerForm: () => void,
-  onUpdateProduct: (arg0: ProductType) => void
+  onUpdateProduct: (arg0: ProductType, arg1: () => void) => void,
+  showEdit: boolean
 }
 
-const EditForm = ({title, price, quantity, _id, onTriggerForm, onUpdateProduct}: EditFormProps) => {
+const ToggleableEditForm = ({title, price, quantity, _id, onTriggerForm, onUpdateProduct, showEdit}: ToggleableEditFormProps) => {
   const [editTitle, setEditTitle] = useState(title)
   const [editPrice, setEditPrice] = useState(`${price}`)
   const [editQuantity, setEditQuantity] = useState(`${quantity}`)
@@ -21,9 +22,12 @@ const EditForm = ({title, price, quantity, _id, onTriggerForm, onUpdateProduct}:
         quantity: Number(editQuantity),
         _id: _id
       }
-      onUpdateProduct(updatedProduct)
-      onTriggerForm()
+      onUpdateProduct(updatedProduct, onTriggerForm)
     }
+  }
+
+  if (!showEdit) {
+    return null
   }
 
   return (
@@ -72,4 +76,4 @@ const EditForm = ({title, price, quantity, _id, onTriggerForm, onUpdateProduct}:
   )
 }
 
-export default EditForm
+export default ToggleableEditForm

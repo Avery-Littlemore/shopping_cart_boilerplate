@@ -2,7 +2,6 @@ import axios from 'axios'
 import { z } from 'zod'
 import { Product } from '../types/index'
 
-
 const productSchema = z.object({
   title: z.string(),
   quantity: z.number(),
@@ -24,7 +23,7 @@ const getProducts = async () => {
   return getProductsResponseSchema.parse(data)
 }
 
-const addProduct = async (newProduct: Product) => {
+const addProduct = async (newProduct: Omit<Product, '_id'>) => {
   const { data } = await axios.post('/api/products', newProduct)
   return addProductResponseSchema.parse(data)
 }
@@ -39,11 +38,19 @@ const removeProduct = async (idToRemove: string) => {
   return removeProductResponseSchema.parse(data)
 }
 
-const buyProducts = async (products: Product[]) => {
-  for (let i = 0; i < products.length; i += 1) {
-    await updateProduct({...products[i], quantity: products[i]['quantity'] - 1})
-  }
-  return
+const getCart = async () => {
+  const { data } = await axios.get('/api/cart')
+  return data
 }
 
-export { getProducts, addProduct, updateProduct, removeProduct, buyProducts }
+const addToCart = async (product: Product) => {
+  const { data } = await axios.post('/api/add-to-cart', { productId: product._id })
+  return data
+}
+
+const checkout = async () => {
+  const { data } = await axios.post('/api/checkout')
+  return data
+}
+
+export { getProducts, addProduct, updateProduct, removeProduct, getCart, addToCart, checkout }

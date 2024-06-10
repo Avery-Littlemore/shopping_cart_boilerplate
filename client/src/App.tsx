@@ -2,8 +2,8 @@ import { useState, useEffect } from 'react'
 import './assets/index.css'
 import Header from './components/Header'
 import ProductList from './components/ProductList'
-import AddProductForm from './components/AddProductForm'
-import { getProducts, addProduct, updateProduct, removeProduct, buyProducts }  from './services/productService'
+import ToggleableAddProductForm from './components/ToggleableAddProductForm'
+import { getProducts, addProduct, updateProduct, removeProduct, getCart, addToCart, checkout }  from './services/productService'
 import { Product } from './types/index'
 
 function App() {
@@ -12,31 +12,42 @@ function App() {
   const [error, setError] = useState(false)
   const [cart, setCart] = useState<Product[]>([])
 
-  const fetchProducts = async () => {
-    try {
-      const data = await getProducts()
-      console.log(data)
-      setProducts(data)
-    } catch (e) {
-      setError(true)
-      console.log(e)
-    }
-  }
-
   useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const data = await getProducts()
+        console.log(data)
+        setProducts(data)
+      } catch (e) {
+        setError(true)
+        console.log(e)
+      }
+    }
+    const fetchCart = async () => {
+      try {
+        const data = await getCart()
+        console.log(data)
+        setCart(data)
+      } catch (e) {
+        setError(true)
+        console.log(e)
+      }
+    }
     fetchProducts()
+    fetchCart()
   }, [])
 
-  const handleTriggerForm = () => {
+  const handleToggleForm = () => {
     setShowAddProduct(prev => !prev)
   }
 
-  const handleAddProduct = (newProduct: Product): void => {
+  const handleAddProduct = (newProduct: Omit<Product, '_id'>): void => {
     const pushProduct = async () => {
       try {
         const data = await addProduct(newProduct)
-        console.log('found product', data)
+        console.log('added product', data)
         setProducts(prev => prev.concat(data))
+        handleToggleForm()
       } catch (e) {
         setError(true)
         console.log(e)
@@ -44,10 +55,9 @@ function App() {
     }
     console.log('adding product')
     pushProduct()
-    handleTriggerForm()
   }
 
-  const handleUpdateProduct = (updatedProduct: Product): void => {
+  const handleUpdateProduct = (updatedProduct: Product, callback?: () => void): void => {
     const editProduct = async () => {
       try {
         const data = await updateProduct(updatedProduct)
@@ -60,6 +70,9 @@ function App() {
             return product
           })
         })
+        if (callback) {
+          callback()
+        }
       } catch (e) {
         setError(true)
         console.log(e)
@@ -67,7 +80,6 @@ function App() {
     }
     console.log('editing product')
     editProduct()
-    handleTriggerForm()
   }
 
   const handleRemoveProduct = (idToRemove: string): void => {
@@ -89,24 +101,53 @@ function App() {
     deleteProduct()
   }
 
-  const handleAddToCart = (prodId: string): void => {
-    setCart(prev => prev.concat(products.filter(prod => prod._id === prodId)))
-  }
-
-  const handleBuy = () => {
-    const buyCartItems = async () => {
+  const handleAddToCart = (product: Product): void => {
+    const addItem = async () => {
       try {
-        const data = await buyProducts(cart)
-        console.log('bought cart items', data)
-        setCart([])
-        fetchProducts()
+        const data = await addToCart(product)
+        console.log('item added', data)
+        setCart(prev => {
+          if (prev.find(cartItem => cartItem.title === data.item.title)) {
+            return prev.map(cartItem => {
+              if (cartItem.title === data.item.title) {
+                return data.item
+              }
+              return cartItem
+            })
+          } else {
+            return prev.concat(data.item)
+          }
+        })
+        setProducts(prev => {
+          return prev.map(product => {
+            if (product.title === data.product.title) {
+              return data.product
+            }
+            return product
+          })
+        })
       } catch (e) {
         setError(true)
         console.log(e)
       }
     }
-    console.log('buying cart items')
-    buyCartItems()
+    console.log('adding item')
+    addItem()
+  }
+
+  const handleCheckout = () => {
+    const buy = async () => {
+      try {
+        const data = await checkout()
+        console.log('checked out', data)
+        setCart([])
+      } catch (e) {
+        setError(true)
+        console.log(e)
+      }
+    }
+    console.log('checking out')
+    buy()
   }
 
   if (error) {
@@ -119,19 +160,19 @@ function App() {
 
   return (
     <div id="app">
-      <Header cart={cart} onBuy={handleBuy} />
+      <Header cart={cart} onCheckout={handleCheckout} />
 
       <main>
         <div className="product-listing">
           <h2>Products</h2>
           <ul className="product-list">
-            <ProductList products={products} onUpdateProduct={handleUpdateProduct} onRemoveProduct={handleRemoveProduct} cart={cart} onAddToCart={handleAddToCart} />
+            <ProductList products={products} onUpdateProduct={handleUpdateProduct} onRemoveProduct={handleRemoveProduct} onAddToCart={handleAddToCart} />
           </ul>
         </div>
         <p>
-          <button className="add-product-button" onClick={handleTriggerForm}>Add A Product</button>
+          <button className="add-product-button" onClick={handleToggleForm}>Add A Product</button>
         </p>
-        {showAddProduct ? <AddProductForm onTriggerForm={handleTriggerForm} onAddProduct={handleAddProduct} /> : null}
+        <ToggleableAddProductForm showAddProduct={showAddProduct} onAddProduct={handleAddProduct} onToggleForm={handleToggleForm} />
       </main>
     </div>
   )

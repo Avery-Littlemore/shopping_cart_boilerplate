@@ -85,13 +85,6 @@ const router = express.Router();
 const Product = require("../models/product");
 const CartItem = require("../models/cartItem");
 
-router.post("/products", (req, res, next) => {
-  const { title, price, quantity } = req.body;
-  Product.create({ title, price, quantity })
-    .then((product) => res.json(product))
-    .catch((err) => next(err));
-});
-
 router.get("/products", (req, res, next) => {
   Product.find({})
     .then((products) => res.json(products))

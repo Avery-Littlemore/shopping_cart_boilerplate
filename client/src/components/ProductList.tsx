@@ -1,19 +1,18 @@
-import Product from './Product'
+import EditableProduct from './EditableProduct'
 import { Product as ProductType } from "../types"
 
 interface ProductListProps {
   products: ProductType[],
   onUpdateProduct: (arg0: ProductType) => void,
   onRemoveProduct: (arg0: string) => void,
-  cart: ProductType[],
-  onAddToCart: (arg0: string) => void
+  onAddToCart: (arg0: ProductType) => void
 }
 
-const ProductList = ({products, onUpdateProduct, onRemoveProduct, cart, onAddToCart}: ProductListProps) => {
+const ProductList = ({products, onUpdateProduct, onRemoveProduct, onAddToCart}: ProductListProps) => {
   return (
     products.map((product) => {
-      return <Product key={product._id} title={product.title} price={product.price} quantity={product.quantity} _id={product._id} 
-      onUpdateProduct={onUpdateProduct} onRemoveProduct={onRemoveProduct} cart={cart} onAddToCart={onAddToCart}/>
+      return <EditableProduct key={product._id} product={product}
+      onUpdateProduct={onUpdateProduct} onRemoveProduct={onRemoveProduct} onAddToCart={onAddToCart}/>
     })
   )
 }
