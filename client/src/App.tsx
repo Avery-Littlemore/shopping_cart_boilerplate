@@ -23,6 +23,7 @@ function App() {
         console.log(e)
       }
     }
+    fetchProducts()
     const fetchCart = async () => {
       try {
         const data = await getCart()
@@ -33,7 +34,6 @@ function App() {
         console.log(e)
       }
     }
-    fetchProducts()
     fetchCart()
   }, [])
 
